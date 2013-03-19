@@ -65,6 +65,8 @@
   "Face name to use for italics")
 (defvar tracwiki-bold-face 'tracwiki-bold-face
   "Face name to use for bolded text")
+(defvar tracwiki-bolditalic-face 'tracwiki-bolditalic-face
+  "Face name to use for bold and italic text.")
 (defvar tracwiki-header-face 'tracwiki-header-face
   "Face name to use for headers")
 (defvar tracwiki-blockquote-face 'tracwiki-blockquote-face
@@ -85,6 +87,11 @@
   "Face for bold text."
   :group 'tracwiki-faces)
 
+(defface tracwiki-bolditalic-face
+  '((t (:inherit tracwiki-bold-face :slant italic)))
+  "Face for bold italic text."
+  :group 'tracwiki-faces)
+
 (defface tracwiki-header-face
   '((t (:inherit font-lock-function-name-face :weight bold)))
   "Base face for headers."
@@ -94,6 +101,38 @@
   '((t (:inherit font-lock-builtin-face)))
   "Face for list item markers."
   :group 'tracwiki-faces)
+
+(defconst tracwiki-regex-nowiki
+  "`.*?`"
+  "Regular expression matching Trac monospaced, unformatted text.")
+
+(defconst tracwiki-regex-underline
+  "__.*__"
+  "Regular expression matching Trac underlined text.")
+
+(defconst tracwiki-regex-strikethrough
+  "~~.*~~"
+  "Regular expression matching Trac strikethrough text.")
+
+(defconst tracwiki-regex-superscript
+  "\\^.*\\^"
+  "Regular expression matching Trac superscripted text.")
+
+(defconst tracwiki-regex-subscript
+  ",,.*,,"
+  "Regular expression matching Trac subscripted text.")
+
+(defconst tracwiki-regex-bolditalic
+  "'\\{5\\}.*'\\{5\\}"
+  "Regular expression matching Trac bolded + italic font")
+
+(defconst tracwiki-regex-bold
+  "'\\{3\\}.*'\\{3\\}"
+  "Regular expression matching Trac bolded font")
+
+(defconst tracwiki-regex-italic
+  "'\\{2\\}.*'\\{2\\}"
+  "Regular expression matching Trac italics")
 
 (defconst tracwiki-regex-header
   "^[ \t]*=[ \t]*.*"
@@ -125,8 +164,12 @@
 (defconst tracwiki-mode-font-lock-keywords
   (list
    (cons 'tracwiki-match-code-blocks 'tracwiki-blockquote-face)
+   (cons tracwiki-regex-nowiki 'tracwiki-blockquote-face)
    (cons tracwiki-regex-header 'tracwiki-header-face)
    (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
+   (cons tracwiki-regex-bolditalic 'tracwiki-bolditalic-face)
+   (cons tracwiki-regex-bold 'tracwiki-bold-face)
+   (cons tracwiki-regex-italic 'tracwiki-italic-face)
    (cons "[0-9]+" 'font-lock-constant-face))
   "Font lock keywords used by TracWiki mode.")
 
