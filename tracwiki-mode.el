@@ -107,31 +107,31 @@
   "Regular expression matching Trac monospaced, unformatted text.")
 
 (defconst tracwiki-regex-underline
-  "__.*__"
+  "__.*?__"
   "Regular expression matching Trac underlined text.")
 
 (defconst tracwiki-regex-strikethrough
-  "~~.*~~"
+  "~~.*?~~"
   "Regular expression matching Trac strikethrough text.")
 
 (defconst tracwiki-regex-superscript
-  "\\^.*\\^"
+  "\\^.*?\\^"
   "Regular expression matching Trac superscripted text.")
 
 (defconst tracwiki-regex-subscript
-  ",,.*,,"
+  ",,.*?,,"
   "Regular expression matching Trac subscripted text.")
 
 (defconst tracwiki-regex-bolditalic
-  "'\\{5\\}.*'\\{5\\}"
+  "'\\{5\\}.*?'\\{5\\}"
   "Regular expression matching Trac bolded + italic font")
 
 (defconst tracwiki-regex-bold
-  "'\\{3\\}.*'\\{3\\}"
+  "'\\{3\\}.*?'\\{3\\}"
   "Regular expression matching Trac bolded font")
 
 (defconst tracwiki-regex-italic
-  "'\\{2\\}.*'\\{2\\}"
+  "'\\{2\\}.*?'\\{2\\}"
   "Regular expression matching Trac italics")
 
 (defconst tracwiki-regex-header
