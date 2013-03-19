@@ -1,0 +1,20 @@
+* TracWiki-Mode
+
+** What is it?
+tracwiki-mode is a major mode for working with [[http://trac.edgewall.org/][Trac]], a popular "open
+source web-based project management and bugtracking system". I got
+tired of working with it in the browser, and sat down and figured out
+how to build a major mode.
+
+** Who wrote it?
+[[http://peawee.net][I did!]] However, large parts of it are inspired by / lifed from
+[[http://jblevins.org/projects/markdown-mode/][Markdown Mode]].
+
+** What's the license?
+GPLv2.
+
+** What's next?
+The current path is to finish fleshing out the Trac syntax, and then
+from there the goal is to work in xml-rpc integration so you don't
+ever have to leave the world's best text editor just to browse
+something as simple as a wiki ;)
