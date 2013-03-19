@@ -67,6 +67,10 @@
   "Face name to use for bolded text")
 (defvar tracwiki-bolditalic-face 'tracwiki-bolditalic-face
   "Face name to use for bold and italic text.")
+(defvar tracwiki-underline-face 'tracwiki-underline-face
+  "Face name to use for underlined text.")
+(defvar tracwiki-definition-face 'tracwiki-definition-face
+  "Face name to use for definition list keywords.")
 (defvar tracwiki-header-face 'tracwiki-header-face
   "Face name to use for headers")
 (defvar tracwiki-blockquote-face 'tracwiki-blockquote-face
@@ -90,6 +94,16 @@
 (defface tracwiki-bolditalic-face
   '((t (:inherit tracwiki-bold-face :slant italic)))
   "Face for bold italic text."
+  :group 'tracwiki-faces)
+
+(defface tracwiki-underline-face
+  '((t (:inherit underline)))
+  "Face for underlined text."
+  :group 'tracwiki-faces)
+
+(defface tracwiki-definition-face
+  '((t (:inherit font-lock-keyword-face :weight bold)))
+  "Face for definition list keywords."
   :group 'tracwiki-faces)
 
 (defface tracwiki-header-face
@@ -138,6 +152,10 @@
   "^[ \t]*=[ \t]*.*"
   "Regular expression matching Trac headers")
 
+(defconst tracwiki-regex-definition
+  "^[ \t]*.*?:\\{2\\}"
+  "Regular expression matching Trac definition lists")
+
 (defconst tracwiki-regex-blockquote
   "^[ \t]*>[ \t]*.*"
   "Regular expression matching Trac blockquotes")
@@ -166,10 +184,12 @@
    (cons 'tracwiki-match-code-blocks 'tracwiki-blockquote-face)
    (cons tracwiki-regex-nowiki 'tracwiki-blockquote-face)
    (cons tracwiki-regex-header 'tracwiki-header-face)
+   (cons tracwiki-regex-definition 'tracwiki-definition-face)
    (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
    (cons tracwiki-regex-bolditalic 'tracwiki-bolditalic-face)
    (cons tracwiki-regex-bold 'tracwiki-bold-face)
    (cons tracwiki-regex-italic 'tracwiki-italic-face)
+   (cons tracwiki-regex-underline 'tracwiki-underline-face)
    (cons "[0-9]+" 'font-lock-constant-face))
   "Font lock keywords used by TracWiki mode.")
 
