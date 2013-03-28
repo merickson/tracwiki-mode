@@ -69,8 +69,14 @@
   "Face name to use for bold and italic text.")
 (defvar tracwiki-underline-face 'tracwiki-underline-face
   "Face name to use for underlined text.")
+(defvar tracwiki-strikethrough-face 'tracwiki-strikethrough-face
+  "Face name to use for strikethrough text.")
 (defvar tracwiki-definition-face 'tracwiki-definition-face
   "Face name to use for definition list keywords.")
+(defvar tracwiki-superscript-face 'tracwiki-superscript-face
+  "Face name to use for superscripted text.")
+(defvar tracwiki-subscript-face 'tracwiki-subscript-face
+  "Face name to use for subscripted text.")
 (defvar tracwiki-header-face 'tracwiki-header-face
   "Face name to use for headers")
 (defvar tracwiki-blockquote-face 'tracwiki-blockquote-face
@@ -101,9 +107,24 @@
   "Face for underlined text."
   :group 'tracwiki-faces)
 
+(defface tracwiki-strikethrough-face
+  '((t (:inherit font-lock-variable-name-face :strike-through t)))
+  "Face for strikethrough text."
+  :group 'tracwiki-faces)
+
 (defface tracwiki-definition-face
   '((t (:inherit font-lock-keyword-face :weight bold)))
   "Face for definition list keywords."
+  :group 'tracwiki-faces)
+
+(defface tracwiki-superscript-face
+  '((t (:inherit default :height 0.8)))
+  "Face for superscripting."
+  :group 'tracwiki-faces)
+
+(defface tracwiki-subscript-face
+  '((t (:inherit underline :height 0.8)))
+  "Face for subscripted text."
   :group 'tracwiki-faces)
 
 (defface tracwiki-header-face
@@ -187,10 +208,12 @@
    (cons tracwiki-regex-definition 'tracwiki-definition-face)
    (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
    (cons tracwiki-regex-bolditalic 'tracwiki-bolditalic-face)
+   (cons tracwiki-regex-strikethrough 'tracwiki-strikethrough-face)
    (cons tracwiki-regex-bold 'tracwiki-bold-face)
    (cons tracwiki-regex-italic 'tracwiki-italic-face)
    (cons tracwiki-regex-underline 'tracwiki-underline-face)
-   (cons "[0-9]+" 'font-lock-constant-face))
+   (cons tracwiki-regex-superscript 'tracwiki-superscript-face)
+   (cons tracwiki-regex-subscript 'tracwiki-subscript-face))
   "Font lock keywords used by TracWiki mode.")
 
 (defun tracwiki-font-lock-extend-region ()
