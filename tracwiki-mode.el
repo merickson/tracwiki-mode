@@ -63,6 +63,8 @@
 
 (defvar tracwiki-italic-face 'tracwiki-italic-face
   "Face name to use for italics")
+(defvar tracwiki-comment-face 'tracwiki-comment-face
+  "Face name to use for Trac wiki comments.")
 (defvar tracwiki-bold-face 'tracwiki-bold-face
   "Face name to use for bolded text")
 (defvar tracwiki-bolditalic-face 'tracwiki-bolditalic-face
@@ -90,6 +92,11 @@
 (defface tracwiki-italic-face
   '((t (:inherit font-lock-variable-name-face :slant italic)))
   "Face for italic text."
+  :group 'tracwiki-faces)
+
+(defface tracwiki-comment-face
+  '((t (:inherit font-lock-comment-face)))
+  "Face for TracWiki comments."
   :group 'tracwiki-faces)
 
 (defface tracwiki-bold-face
@@ -132,6 +139,11 @@
   "Base face for headers."
   :group 'tracwiki-faces)
 
+(defface tracwiki-camelcase-face
+  '((t (:inherit font-lock-function-name-face)))
+  "Base face for CamelCase links"
+  :group 'tracwiki-faces)
+
 (defface tracwiki-blockquote-face
   '((t (:inherit font-lock-builtin-face)))
   "Face for list item markers."
@@ -148,6 +160,10 @@
 (defconst tracwiki-regex-strikethrough
   "~~.*?~~"
   "Regular expression matching Trac strikethrough text.")
+
+(defconst tracwiki-regex-camelcase
+  "\\([[:upper:]]\\{1\\}\\w+\\)\\{2,\\}"
+  "Regular expression matching Trac CamelCase.")
 
 (defconst tracwiki-regex-superscript
   "\\^.*?\\^"
@@ -200,13 +216,34 @@
                  (t nil)))
           (t nil))))
 
+(defun tracwiki-match-comment-blocks (last)
+  "Match comment blocks from point to LAST."
+  (let (open lang body close all)
+    (cond ((and (eq major-mode 'tracwiki-mode)
+                (search-forward-regexp "^\\({{{#!comment\\)\\(\\w+\\)?$" last t))
+           (beginning-of-line)
+           (setq open (list (match-beginning 1) (match-end 1))
+                 lang (list (match-beginning 2) (match-end 2)))
+           (forward-line)
+           (setq body (list (point)))
+           (cond ((search-forward-regexp "^}}}$" last t)
+                  (setq body (reverse (cons (1- (match-beginning 0)) body))
+                        close (list (match-beginning 0) (match-end 0))
+                        all (list (car open) (match-end 0)))
+                  (set-match-data (append all open lang body close))
+                  t)
+                 (t nil)))
+          (t nil))))
+
 (defconst tracwiki-mode-font-lock-keywords
   (list
+   (cons 'tracwiki-match-comment-blocks 'tracwiki-comment-face)
    (cons 'tracwiki-match-code-blocks 'tracwiki-blockquote-face)
    (cons tracwiki-regex-nowiki 'tracwiki-blockquote-face)
+   (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
+   (list tracwiki-regex-camelcase '(0 'tracwiki-camelcase-face))
    (cons tracwiki-regex-header 'tracwiki-header-face)
    (cons tracwiki-regex-definition 'tracwiki-definition-face)
-   (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
    (cons tracwiki-regex-bolditalic 'tracwiki-bolditalic-face)
    (cons tracwiki-regex-strikethrough 'tracwiki-strikethrough-face)
    (cons tracwiki-regex-bold 'tracwiki-bold-face)
@@ -234,7 +271,9 @@ This helps improve font locking for block constructs such as pre blocks."
 ;;; Mode definition
 (define-derived-mode tracwiki-mode text-mode "TracWiki"
   "Mode for Trac wiki text and tickets"
-  ; Font locking
+  ; Font locking. Ensure that case-fold is disabled!
+  (set (make-local-variable 'font-lock-keywords-case-fold-search)
+       nil)
   (set (make-local-variable 'font-lock-defaults) 
        '(tracwiki-mode-font-lock-keywords))
 
