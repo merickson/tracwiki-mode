@@ -140,7 +140,7 @@
   :group 'tracwiki-faces)
 
 (defface tracwiki-camelcase-face
-  '((t (:inherit font-lock-function-name-face)))
+  '((t (:inherit font-lock-type-face)))
   "Base face for CamelCase links"
   :group 'tracwiki-faces)
 
