@@ -6,6 +6,7 @@
 ;; Maintainer: Matthew Erickson <peawee@peawee.net>
 ;; Created: March 13, 2013
 ;; Version: 0.1
+;; Package-Requires: ((xml-rpc "1.6.8"))
 ;; Keywords: Trac, wiki, tickets
 
 ;; This file is not part of GNU Emacs.
@@ -288,6 +289,7 @@ This helps improve font locking for block constructs such as pre blocks."
       (setq font-lock-beg found))))
 
 ;;; Mode definition
+;;;###autoload
 (define-derived-mode tracwiki-mode text-mode "TracWiki"
   "Mode for Trac wiki text and tickets"
   ; Font locking. Ensure that case-fold is disabled!
@@ -301,3 +303,4 @@ This helps improve font locking for block constructs such as pre blocks."
             'tracwiki-font-lock-extend-region))
 
 (provide 'tracwiki-mode)
+;;; tracwiki-mode.el ends here
