@@ -85,8 +85,8 @@
   "Face name to use for blockquotes")
 (defvar tracwiki-camelcase-face 'tracwiki-camelcase-face
   "Face name to use for CamelCase")
-(defvar tracwiki-doublebracket-face 'tracwiki-doublebracket-face
-  "Face name to use for doublebrackets")
+(defvar tracwiki-link-face 'tracwiki-link-face
+  "Face name to use for links")
 
 (defgroup tracwiki-faces nil
   "Faces used in Tracwiki mode"
@@ -143,9 +143,9 @@
   "Base face for headers."
   :group 'tracwiki-faces)
 
-(defface tracwiki-doublebracket-face
+(defface tracwiki-link-face
   '((t (:inherit font-lock-type-face)))
-  "Base face for [[doublebracket]] links"
+  "Base face for [[link]] links"
   :group 'tracwiki-faces)
 
 (defface tracwiki-camelcase-face
@@ -170,9 +170,13 @@
   "~~.*?~~"
   "Regular expression matching Trac strikethrough text.")
 
-(defconst tracwiki-regex-doublebracket-link
+(defconst tracwiki-regex-link-link
   "\\[\\[\\w+]]"
   "Regular expression matching Trac double-bracket links.")
+
+(defconst tracwiki-regex-issuelink
+  "#[[:digit:]]+"
+  "Regular expression matching trac issues")
 
 (defconst tracwiki-regex-camelcase
   "\\([[:upper:]]\\{1\\}[[:lower:]]+/?\\)\\{2,\\}"
@@ -254,7 +258,8 @@
    (cons 'tracwiki-match-code-blocks 'tracwiki-blockquote-face)
    (cons tracwiki-regex-nowiki 'tracwiki-blockquote-face)
    (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
-   (cons tracwiki-regex-doublebracket-link 'tracwiki-doublebracket-face)
+   (cons tracwiki-regex-issuelink 'tracwiki-link-face)
+   (cons tracwiki-regex-link-link 'tracwiki-link-face)
    (list tracwiki-regex-camelcase '(0 'tracwiki-camelcase-face))
    (cons tracwiki-regex-header 'tracwiki-header-face)
    (cons tracwiki-regex-definition 'tracwiki-definition-face)
