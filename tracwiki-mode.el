@@ -37,6 +37,8 @@
 ;; trac-wiki by Shun-ichi GOTO:
 ;; http://trac-hacks.org/wiki/EmacsWikiEditScript
 
+(require 'url)
+(require 'url-http)
 (require 'xml-rpc)
 
 ;;; Constants
@@ -183,6 +185,31 @@ user may need or want to edit them.")
 	      (symbol-value sym)
 	    nil)))))
 
+;;;
+;;; XML-RPC functions
+;;;
+(defun trac-rpc-call (method &rest args)
+  "Call METHOD with ARGS via XML-RPC and return response data.
+WARNING: This functionis not use because synchronous
+`xml-rpc-method-call' has strange behavour on authentication
+retrying.  Use `trac-rpc-call-async' instead."
+  (when (< emacs-major-version 22)
+    (ad-activate 'encode-coding-string))
+  (unwind-protect
+      (let* ((url-http-attempt-keepalives tracwiki-use-keepalive)
+	     (ep trac-rpc-endpoint)
+	     (xml-rpc-base64-encode-unicode nil)
+	     (xml-rpc-base64-decode-unicode nil)
+	     (result (with-temp-buffer
+		       (apply 'xml-rpc-method-call
+			      ep method args))))
+	(if (and (numberp result) (= result 0))
+	    nil
+	  (if (stringp result)
+	      (apply `concat (split-string result "\r"))
+	    result)))
+    (when (< emacs-major-version 22)
+      (ad-deactivate 'encode-coding-string))))
 
 ;;; 
 ;;; Font Lock
