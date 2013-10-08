@@ -183,6 +183,22 @@
   "\\([[:upper:]]\\{1\\}[[:lower:]]+/?\\)\\{2,\\}"
   "Regular expression matching Trac CamelCase.")
 
+(defconst tracwiki-regex-uri
+  (concat (regexp-opt tracwiki-uri-types) ":[^]\t\n\r<>,;() ]+")
+  "Regular expression for matching inline URIs.")
+
+(defconst tracwiki-regex-email
+  "<\\(\\(\\sw\\|\\s_\\|\\s.\\)+@\\(\\sw\\|\\s_\\|\\s.\\)+\\)>"
+  "Regular expression for matching inline email addresses.")
+
+(defconst tracwiki-regex-link-generic
+  (concat "\\(?:" tracwiki-regex-link-link
+          "\\|" tracwiki-regex-camelcase
+          "\\|" tracwiki-regex-issuelink
+          "\\|" tracwiki-regex-uri
+          "\\|" tracwiki-regex-email "\\)")
+  "Regular expression for matching any recognized link.")
+
 (defconst tracwiki-regex-superscript
   "\\^.*?\\^"
   "Regular expression matching Trac superscripted text.")
@@ -259,9 +275,9 @@
    (cons 'tracwiki-match-code-blocks 'tracwiki-blockquote-face)
    (cons tracwiki-regex-nowiki 'tracwiki-blockquote-face)
    (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
-   (cons tracwiki-regex-issuelink 'tracwiki-link-face)
-   (cons tracwiki-regex-link-link 'tracwiki-link-face)
-   (list tracwiki-regex-camelcase '(0 'tracwiki-camelcase-face))
+   (cons tracwiki-regex-link-generic 'tracwiki-link-face)
+   (cons tracwiki-regex-email 'tracwiki-link-face)
+;   (list tracwiki-regex-camelcase '(0 'tracwiki-camelcase-face))
    (cons tracwiki-regex-header 'tracwiki-header-face)
    (cons tracwiki-regex-definition 'tracwiki-definition-face)
    (cons tracwiki-regex-bolditalic 'tracwiki-bolditalic-face)
