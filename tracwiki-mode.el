@@ -31,6 +31,11 @@
 ;; tracwiki-mode is a major mode for editing Trac-formatted text files
 ;; in GNU Emacs. tracwiki-mode is free software, licensed under the
 ;; GNU GPL.
+;;
+;; Much of the syntax highlight is based on markdown-mode.el's handling
+;; of it, and much of the Trac integration based on the original
+;; trac-wiki by Shun-ichi GOTO:
+;; http://trac-hacks.org/wiki/EmacsWikiEditScript
 
 (require 'xml-rpc)
 
@@ -59,7 +64,129 @@
   :group 'tracwiki
   :type 'list)
 
+(defcustom tracwiki-projects
+  '(("trac-hacks"
+     :endpoint "http://trac-hacks.org/login/xmlrpc"))
+  "*List of project definitions.
+The value is an alist of the project name and information plist.
+For example:
+'((\"meadow\"
+     :endpoint \"http://www.meadowy.org/meadow/login/xmlrpc\"
+     :login-name \"bob\")
+    (\"local-test\"
+     :endpoint \"http://localhost/project/test/xmlrpc\"
+     :login-name \"bob\"
+     :name \"Billy Bob\")))")
+
+(defcustom tracwiki-hide-system-pages t
+  "If non-nil, do not list system pages on completion.
+System pages are defined by `tracwiki-system-pages' as a regexp.
+Although these pages are not listed, you can visit them by
+specifying a page name explicitly.")
+
+(defcustom tracwiki-hidden-pages nil
+  "*List of regexps to be hidden on completion of a page name.
+System pages are always hidden if `tracwiki-hide-system-pages' is
+non-nil.")
+
+(defcustom tracwiki-search-default-filters '("wiki")
+  "*List of search filter name(s) to use as the default.
+Available filter names are:
+   wiki      : Search in all wiki pages.
+   ticket    : Search the description and comments of all tickets.
+   changeset : Search the commit log of all changesets.")
+
+(defcustom tracwiki-max-history 100
+  "*Maximum number of wiki page revisions to fetch.
+See `trac-wiki-history'.")
+
+(defcustom tracwiki-history-count 10
+  "*Normal number of wiki page revisions to fetch.
+See `trac-wiki-history'.")
+
+(defcustom tracwiki-use-keepalive
+  (and (boundp 'url-http-real-basic-auth-storage)
+       url-http-attempt-keepalives)
+  "*If non-nil, use keep-alive option for http connection.
+This value should be nil for old url library such as the one
+on debian sarge stable .")
+
+(defcustom tracwiki-update-page-name-cache-on-visit t
+  "*If non-nil, update the page name cache on ever `trac-wiki-edit' call.
+Collecting page names might be expensive for some environments and uses.
+By setting this variable to nil, the page name cache is updated only when
+invoking the `tracwiki' command or doing completion with the prefix in the
+page edit buffer.")
+
+;;;
+;;; Internal variables
+;;;
+(defvar tracwiki-macro-name-cache nil
+  "Alist of endpoint and macro name list.")
+
+(defvar tracwiki-page-name-cache nil
+  "Alist of endpoint and page name list.")
+
+(defvar trac-rpc-endpoint nil)
+(make-variable-buffer-local 'trac-rpc-endpoint)
+
+(defvar tracwiki-project-info nil)
+(make-variable-buffer-local 'tracwiki-project-info)
+
+(defvar tracwiki-page-info nil)
+(make-variable-buffer-local 'tracwiki-page-info)
+
+(defvar tracwiki-search-keyword-hist nil)
+(defvar tracwiki-search-filter-hist nil)
+
+(defvar tracwiki-search-filter-cache nil
+  "Alist of end-point and list of filter names supported in site.
+This value is made automaticaly on first search access.")
+
+(defconst tracwiki-system-pages
+  '("CamelCase" "InterMapTxt" "InterTrac" "InterWiki"
+    "RecentChanges" "TitleIndex"
+    "TracAccessibility" "TracAdmin" "TracBackup" "TracBrowser"
+    "TracCgi" "TracChangeset" "TracEnvironment" "TracFastCgi"
+    "TracGuide" "TracHacks" "TracImport" "TracIni"
+    "TracInstall" "TracInstallPlatforms" "TracInterfaceCustomization"
+    "TracLinks" "TracLogging" "TracModPython" "TracMultipleProjects"
+    "TracNotification" "TracPermissions" "TracPlugins" "TracQuery"
+    "TracReports" "TracRevisionLog" "TracRoadmap" "TracRss"
+    "TracSearch" "TracStandalone" "TracSupport" "TracSyntaxColoring"
+    "TracTickets" "TracTicketsCustomFields" "TracTimeline"
+    "TracUnicode" "TracUpgrade" "TracWiki" "WikiDeletePage"
+    "WikiFormatting" "WikiHtml" "WikiMacros" "WikiNewPage"
+    "WikiPageNames" "WikiProcessors" "WikiRestructuredText"
+    "WikiRestructuredTextLinks"
+    ;; appeared in 0.11
+    "TracWorkflow" "PageTemplates")
+  "List of page names provided by trac as default.
+These files are hidden on completion since not edited usualy.
+These can be listed setting by variable
+`tracwiki-hide-system-pages' as nil.
+Two pages WikiStart and SandBox is not in this list because
+user may need or want to edit them.")
+
+;; history holder
+(defvar tracwiki-project-history nil)
+(defvar tracwiki-url-history nil)
+(defvar tracwiki-page-history nil)
+(defvar tracwiki-comment-history nil)
+
+(if (not (fboundp 'buffer-local-value))
+    (defun buffer-local-value (sym buf)
+      (if (not (buffer-live-p buf))
+	  nil
+	(with-current-buffer buf
+	  (if (boundp sym)
+	      (symbol-value sym)
+	    nil)))))
+
+
+;;; 
 ;;; Font Lock
+;;;
 (require 'font-lock)
 
 (defvar tracwiki-italic-face 'tracwiki-italic-face
@@ -277,7 +404,6 @@
    (cons tracwiki-regex-blockquote 'tracwiki-blockquote-face)
    (cons tracwiki-regex-link-generic 'tracwiki-link-face)
    (cons tracwiki-regex-email 'tracwiki-link-face)
-;   (list tracwiki-regex-camelcase '(0 'tracwiki-camelcase-face))
    (cons tracwiki-regex-header 'tracwiki-header-face)
    (cons tracwiki-regex-definition 'tracwiki-definition-face)
    (cons tracwiki-regex-bolditalic 'tracwiki-bolditalic-face)
@@ -304,6 +430,7 @@ This helps improve font locking for block constructs such as pre blocks."
         (setq font-lock-end (point)))
       (setq font-lock-beg found))))
 
+;;;
 ;;; Mode definition
 ;;;###autoload
 (define-derived-mode tracwiki-mode text-mode "TracWiki"
