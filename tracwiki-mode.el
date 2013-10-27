@@ -34,9 +34,12 @@
 ;;
 ;; Starting in version 0.2, I've pretty much just copypasta'ed most of
 ;; the original trac-wiki from Shun-ichi GOTO:
-;; http://trac-hacks.org/wiki/EmacsWikiEditScript
-;; Future versions will include better English, yet more controls, and
-;; better customization.
+;; http://trac-hacks.org/wiki/EmacsWikiEditScript Future versions will
+;; include better English, yet more controls, and better
+;; customization. Seriously though, without Shun-ichi Goto's work,
+;; none of this magic would exist.
+;;
+;;
 
 ;;; Overview:
 
@@ -77,26 +80,29 @@
 ;;  Step 1. Get and enable XmlRpcPlugin on your trac site.
 ;;          http://trac-hacks.org/wiki/XmlRpcPlugin
 ;;
-;;          Install and setup it with refering the page above.  Don't
-;;          forget enabling plugin in trac.ini and adding permission
-;;          to allow user accessing via XML-RPC.  For example, it is
-;;          recommended to add 'XML_RPC' permission to 'authenticated'
-;;          subject to allow XML-RPC access only for relyable users.
+;;          Install and setup it referencing the page above for
+;;          documentation.  Don't forget enabling the plugin in
+;;          trac.ini and adding permissions to allow user access via
+;;          XML-RPC.  For example, it is recommended to add the
+;;          'XML_RPC' permission to 'authenticated' subjects to allow
+;;          XML-RPC access only for reliable users.
 ;;
-;;  Step 2. Set project information variable `trac-projects'
+;;  Step 2. Set the project information variable `trac-projects'
 ;;          in your .emacs.
 ;;
-;;          If you have a trac site frequently visit to edit, you can
-;;          register the url of that site with alias name.  To do this
-;;          use `tracwiki-define-project' like this:
+;;          If you have a trac site you frequently visit, you can
+;;          register the url of that site with a project name.  To do this
+;;          use `tracwiki-define-project':
 ;;
 ;;            (tracwiki-define-project "trac-hacks"
 ;;                                      "http://trac-hacks.org/" t)
 ;;
-;;          1st argument is alias name which is used on selection.
-;;          2nd arugment is actual url.  3rd optional argument indicates
-;;          login is required for the site access.
-;;          If you have multiple instance in one site, you can use
+;;          1st argument is the project name which is used on selection.
+;;          2nd arugment is actual url.
+;;          3rd optional argument indicates if login is required to access 
+;;              the site.
+;;
+;;          If you have multiple projects on one site, you can use
 ;;          `tracwiki-define-multiple-projects'.
 ;;          Ex.
 ;;             (tracwiki-define-multiple-projects
@@ -106,40 +112,38 @@
 ;;          An example above is equivalent to three
 ;;          `tracwiki-define-project' definition.
 ;;
-;;          Note: Old version of `tracwiki.el' required XML-RPC
-;;                end-point url for these functions.  Recent veresion
-;;                of `tracwiki.el', however, `tracwiki.el` expects
-;;                normal site url instead of end-point url.
 ;;
 ;;  Step 3. Set proxy information.
 ;;
-;;          Url library gets proxy information via variable
-;;          `url-proxy-services'.  It is well to set in your .emacs.
+;;          The url library gets proxy information via the variable
+;;          `url-proxy-services'.  Ensure it is set in your .emacs if
+;;          you require proxying.
 ;;
-;;          See info of url pakage for more detail.
-;;          Jump to info node by evaluating this:
-;;            (Info-goto-node "(url)Proxies")
-
+;;          See the info page of the url package for more detail.
+;;          Jump to the info node by evaluating this:
+;;            (info-goto-node "(url)Proxies")
+;;
 ;;  Step 4. Set autoload and more.
 ;;
-;;          Set autoload definition in your .emacs for convenience:
+;;          Set the autoload definition in your .emacs for convenience:
 ;;
 ;;           (autoload 'tracwiki "tracwiki"
 ;;                     "Trac wiki editing entry-point." t)
 ;;
-;;          And load mule-ucs for Emacs 21.x user.
+;;          Also load mule-ucs if you're an Emacs 21.x user.
 
 ;;; NOTICE:
 
-;; There is a notice for authentication.  If your target trac site
-;; provides multiple authentication scheme (ex. both NTLM and BASIC)
-;; and first one is not supported by url package, authentication step
-;; is ignored. It's bug of url-http.el. On this case, you may encount
-;; endless user/pass query.  For example, this case will be occured
-;; when trac site uses mod_auth_sspi for domain/ActiveDirectory
-;; authentication and allowing fallback to basic authentication. This
-;; setting generates two WWW-Authenticate: line and first one is NTLM
-;; auth and url package cannot recognize it. Thus fail.
+;; There is an issue concerning authentication.  If your target trac
+;; site provides multiple authentication schemes (ex. both NTLM and
+;; BASIC) and first one is not supported by the url package, the
+;; authentication step is ignored. It's bug of url-http.el. On this
+;; case, you may encounter endless user/pass query loops.  For
+;; example, this case will be encountered when the trac site uses
+;; mod_auth_sspi for domain/ActiveDirectory authentication and
+;; allowing fallback to basic authentication. This setting generates
+;; two WWW-Authenticate: line and first one is NTLM auth and url
+;; package cannot recognize it. Thus fail.
 ;;
 ;; To avoid this:
 ;;  - Apply following patch
@@ -165,58 +169,59 @@
 ;;  2. Specify project name.
 ;;  3. Specify page name.
 ;;  4. Edit page content.
-;;  5. Check difference.
+;;  5. Check differences.
 ;;  6. Preview page output.
 ;;  6. Commit it.
 
-;; `tracwiki' command ask you project name defined by
+;; The `tracwiki' command asks you for the project name defined by
 ;; `tracwiki-define-project' or `tracwiki-define-multiple-projects'
-;; with completion.  If you want to specify URL directly, hit ENTER
-;; wihout any characters when you asked for project name, then enter site URL
-;; next prompt.
+;; with completion.  If you want to specify the URL directly, hit
+;; ENTER wihout any characters when you are asked for the project
+;; name, then enter site the URL at the next prompt.
 ;;
-;; Then ask page name to edit with completion.  Available page names
-;; are retreived from remote site by XML-RPC request dynamicaly.
-;; If you specified non existing name, it means creating new page and
-;; start editing from empty.
+;; Then it asks for the page name to edit with completion.  Available
+;; page names are retreived from the remote site by XML-RPC requests
+;; dynamicaly.  If you specified a non existing name, it means
+;; creating a new page and start editing it from empty.
 ;;
 ;; After you edit the page content, you should commit by
 ;; `tracwiki-commit' (C-c C-c) to finish editing.
-;; If you want to cancel editing, you can kill the buffer simply.
-;; Or use `tracwiki-revert' (C-c C-u) for cancel changes in buffer.
+;; If you want to cancel editing, you can kill the buffer.
+;; Or use `tracwiki-revert' (C-c C-u) to cancel changes in buffer.
 
 ;; While editing the page, the buffer is in `tracwiki-mode' which is
-;; based on `text-mode'. you can specify some mode specific commands:
+;; based on `text-mode'. You can specify some mode specific commands:
 ;;
 ;;   C-c C-c ... `tracwiki-commit'
-;;       Commit current editing content.
-;;       Same project (end-point) is used, or ask project with C-u.
+;;       Commit edits in the current buffer.
+;;       The same project that created the buffer is used by default, or 
+;;       specify the project with C-u.
 ;;   C-c C-o ... `tracwiki-edit'
 ;;       Edit another page in new buffer.
 ;;   C-c C-p ... `tracwiki-preview'
-;;       Preview current content by w3m (text base).
-;;       With C-u, preview by external browser (graphical).
+;;       Preview current content with w3m (text based).
+;;       With C-u, preview with an external browser (graphical).
 ;;   C-c = ... `tracwiki-diff'
 ;;   C-c C-d ... `tracwiki-diff'
-;;       Make diff between current content and original content
+;;       Make a diff between the current content and the original content
 ;;       With C-u,  execute ediff instead of diff.
 ;;   C-c C-m ... `tracwiki-merge'
 ;;       Merge with most recent page content using `ediff-merge'.
-;;       If not modified, turn current buffer to newest version.
+;;       If it is not modified, turn the current buffer to the newest version.
 ;;   C-c C-u ... `tracwiki-revert'
-;;       Revert to original content discarding current modification.
-;;       It shows diff and confirm you before do it.
+;;       Revert to the original content discarding current modifications.
+;;       It shows the diff and asks you to confirm before proceeding.
 ;;   M-C-i ... `tracwiki-complete-at-point'
 ;;       Complete macro name or page name on current point.
 ;;       The macro names are collected from "WikiMacros" page on the
-;;       site (and cached).
+;;       site and cached.
 ;;   C-c C-h ... `tracwiki-history'
 ;;       Show page history in other buffer.
 ;;       History is information returned from xmlrpc plugin.
 ;;       On each revision entry, you can show diff on its revision
-;;       by '=' key.
+;;       with the '=' key.
 ;;   C-c C-s ... `tracwiki-search'
-;;       Search on project site for specified keywords.
+;;       Search on the project site for specified keywords.
 ;;       You can specify keywords and filters. The result is shown
 ;;       in another buffer with highlighting.
 ;;
