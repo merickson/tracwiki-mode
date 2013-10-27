@@ -252,7 +252,7 @@
   "Major mode for editing text files and tickets from a Trac wiki."
   :prefix "tracwiki-"
   :group  'wp
-  :link   '(url-link "http://peawee.net"))
+  :link   '(url-link "https://github.com/merickson/tracwiki-mode"))
 
 
 (defcustom tracwiki-uri-types
