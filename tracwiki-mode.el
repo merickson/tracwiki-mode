@@ -88,27 +88,27 @@
 ;;
 ;;          If you have a trac site frequently visit to edit, you can
 ;;          register the url of that site with alias name.  To do this
-;;          use `trac-wiki-define-project' like this:
+;;          use `tracwiki-define-project' like this:
 ;;
-;;            (trac-wiki-define-project "trac-hacks"
+;;            (tracwiki-define-project "trac-hacks"
 ;;                                      "http://trac-hacks.org/" t)
 ;;
 ;;          1st argument is alias name which is used on selection.
 ;;          2nd arugment is actual url.  3rd optional argument indicates
 ;;          login is required for the site access.
 ;;          If you have multiple instance in one site, you can use
-;;          `trac-wiki-define-multiple-projects'.
+;;          `tracwiki-define-multiple-projects'.
 ;;          Ex.
-;;             (trac-wiki-define-multiple-projects
+;;             (tracwiki-define-multiple-projects
 ;;                   '("proj1" "proj2" "test")
 ;;                    "http://www.foo.bar.org/" t)
 ;;
 ;;          An example above is equivalent to three
-;;          `trac-wiki-define-project' definition.
+;;          `tracwiki-define-project' definition.
 ;;
-;;          Note: Old version of `trac-wiki.el' required XML-RPC
+;;          Note: Old version of `tracwiki.el' required XML-RPC
 ;;                end-point url for these functions.  Recent veresion
-;;                of `trac-wiki.el', however, `trac-wiki.el` expects
+;;                of `tracwiki.el', however, `tracwiki.el` expects
 ;;                normal site url instead of end-point url.
 ;;
 ;;  Step 3. Set proxy information.
@@ -124,7 +124,7 @@
 ;;
 ;;          Set autoload definition in your .emacs for convenience:
 ;;
-;;           (autoload 'trac-wiki "trac-wiki"
+;;           (autoload 'tracwiki "tracwiki"
 ;;                     "Trac wiki editing entry-point." t)
 ;;
 ;;          And load mule-ucs for Emacs 21.x user.
@@ -158,10 +158,10 @@
 
 ;;; Usage:
 
-;; You can start editing by `M-x trac-wiki`.
+;; You can start editing by `M-x tracwiki`.
 ;; Flow of editing is:
 
-;;  1. M-x trac-wiki
+;;  1. M-x tracwiki
 ;;  2. Specify project name.
 ;;  3. Specify page name.
 ;;  4. Edit page content.
@@ -169,8 +169,8 @@
 ;;  6. Preview page output.
 ;;  6. Commit it.
 
-;; `trac-wiki' command ask you project name defined by
-;; `trac-wiki-define-project' or `trac-wiki-define-multiple-projects'
+;; `tracwiki' command ask you project name defined by
+;; `tracwiki-define-project' or `tracwiki-define-multiple-projects'
 ;; with completion.  If you want to specify URL directly, hit ENTER
 ;; wihout any characters when you asked for project name, then enter site URL
 ;; next prompt.
@@ -181,46 +181,46 @@
 ;; start editing from empty.
 ;;
 ;; After you edit the page content, you should commit by
-;; `trac-wiki-commit' (C-c C-c) to finish editing.
+;; `tracwiki-commit' (C-c C-c) to finish editing.
 ;; If you want to cancel editing, you can kill the buffer simply.
-;; Or use `trac-wiki-revert' (C-c C-u) for cancel changes in buffer.
+;; Or use `tracwiki-revert' (C-c C-u) for cancel changes in buffer.
 
-;; While editing the page, the buffer is in `trac-wiki-mode' which is
+;; While editing the page, the buffer is in `tracwiki-mode' which is
 ;; based on `text-mode'. you can specify some mode specific commands:
 ;;
-;;   C-c C-c ... `trac-wiki-commit'
+;;   C-c C-c ... `tracwiki-commit'
 ;;       Commit current editing content.
 ;;       Same project (end-point) is used, or ask project with C-u.
-;;   C-c C-o ... `trac-wiki-edit'
+;;   C-c C-o ... `tracwiki-edit'
 ;;       Edit another page in new buffer.
-;;   C-c C-p ... `trac-wiki-preview'
+;;   C-c C-p ... `tracwiki-preview'
 ;;       Preview current content by w3m (text base).
 ;;       With C-u, preview by external browser (graphical).
-;;   C-c = ... `trac-wiki-diff'
-;;   C-c C-d ... `trac-wiki-diff'
+;;   C-c = ... `tracwiki-diff'
+;;   C-c C-d ... `tracwiki-diff'
 ;;       Make diff between current content and original content
 ;;       With C-u,  execute ediff instead of diff.
-;;   C-c C-m ... `trac-wiki-merge'
+;;   C-c C-m ... `tracwiki-merge'
 ;;       Merge with most recent page content using `ediff-merge'.
 ;;       If not modified, turn current buffer to newest version.
-;;   C-c C-u ... `trac-wiki-revert'
+;;   C-c C-u ... `tracwiki-revert'
 ;;       Revert to original content discarding current modification.
 ;;       It shows diff and confirm you before do it.
-;;   M-C-i ... `trac-wiki-complete-at-point'
+;;   M-C-i ... `tracwiki-complete-at-point'
 ;;       Complete macro name or page name on current point.
 ;;       The macro names are collected from "WikiMacros" page on the
 ;;       site (and cached).
-;;   C-c C-h ... `trac-wiki-history'
+;;   C-c C-h ... `tracwiki-history'
 ;;       Show page history in other buffer.
 ;;       History is information returned from xmlrpc plugin.
 ;;       On each revision entry, you can show diff on its revision
 ;;       by '=' key.
-;;   C-c C-s ... `trac-wiki-search'
+;;   C-c C-s ... `tracwiki-search'
 ;;       Search on project site for specified keywords.
 ;;       You can specify keywords and filters. The result is shown
 ;;       in another buffer with highlighting.
 ;;
-;; Since outline minor mode is also enabled by trac-wiki mode,
+;; Since outline minor mode is also enabled by tracwiki mode,
 ;; You can fold the sections.
 
 ;;; References:
