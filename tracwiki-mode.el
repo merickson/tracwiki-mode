@@ -259,6 +259,10 @@
   :group  'wp
   :link   '(url-link "https://github.com/merickson/tracwiki-mode"))
 
+(defcustom trac-projects nil
+  "List of projects. More documentation coming soon, promise!"
+  :group 'tracwiki
+  :type 'sexp)
 
 (defcustom tracwiki-uri-types
   '("acap" "cid" "data" "dav" "fax" "file" "ftp" "gopher" "http" "https"
