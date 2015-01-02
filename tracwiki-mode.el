@@ -2129,6 +2129,6 @@ For exmple:
 		(nconc d (list a)))))))
     dst))
 
-(provide 'tracwiki)
+(provide 'tracwiki-mode)
 
 ;;; tracwiki-mode.el ends here
